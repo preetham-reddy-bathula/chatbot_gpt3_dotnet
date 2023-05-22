@@ -1,0 +1,42 @@
+﻿@model List<Chatbot.Models.Message>
+
+<div id="chatWindow">
+    @foreach (var message in Model)
+    {
+        <div class="message">
+            <strong>@message.User</strong>: @message.Content
+        </div>
+    }
+</div>
+
+<form id="chatForm">
+    <input type="text" id="content" />
+    <input type="submit" value="Send" />
+</form>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#chatForm').on('submit', function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: '@Url.Action("Send", "Chat")',
+                type: 'POST',
+                data: { content: $('#content').val() },
+                success: function (data) {
+                    $('#chatWindow').empty();
+
+                    $.each(data, function (i, item) {
+                        var message = $('<div>').addClass('message')
+                            .html('<strong>' + item.user + ':</strong> ' + item.content);
+                        $('#chatWindow').append(message);
+                    });
+
+                    $('#content').val('');
+                }
+            });
+        });
+    });
+</script>
